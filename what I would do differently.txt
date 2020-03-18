@@ -1,0 +1,5 @@
+If this was a production application, I definitely would consider hashing the
+user passwords to make them more secure. I also would not have an admin who
+would have any access to the users' data. Rather, the only people who would have
+access to data will be the users themselves to their own data. I will also
+consider writing some documentation for my API.

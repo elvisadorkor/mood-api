@@ -1,0 +1,12 @@
+The app can be run from the terminal with python by running 'python3 app.py'
+
+The app is then launched on the server and can be interacted with by using an
+API client like Postman to make requests and read the responses.
+
+The /user endpoint can be used to create users using the POST method and can
+also be used to get information on users like their names and unique ID's.
+
+The /mood endpoint can be used to submit a logged in user's mood rating and
+also get a user's past mood ratings. I also shows a user's current streak.
+
+The /login endpoint is where a user logs in with their credentials. 
