@@ -165,13 +165,33 @@ def login():
 
 # handle route for mood
 @app.route('/mood', methods = ['POST'])
+@require_token
 # function to add a new mood rating submitted by a user
-def add_mood_rating():
+def add_mood_rating(curr_auth_user):
     data = request.get_json()
-    new_mood_rating = MoodRating(value=data['value'], time=datetime.datetime.now(), user_id=str(uuid.uuid4()))
+    #create mood rating object with user id as logged in user's id
+    new_mood_rating = MoodRating(value=data['value'], time=datetime.datetime.now(), user_id=curr_auth_user.id)
     db.session.add(new_mood_rating)
     db.session.commit()
     return jsonify({'message': 'new mood rating has been created'})
+
+@app.route('/mood', methods = ['GET'])
+@require_token
+#function to get values from logged in user
+def get_user_mood_ratings(curr_auth_user):
+    #get mood ratings with user_id as the currently logged user
+    ratings = MoodRating.query.filter_by(user_id=curr_auth_user.id).all()
+    result = []
+    for rating in ratings:
+        rating_info = {}
+        rating_info['id'] = rating.id
+        rating_info['value'] = rating.value
+        rating_info['time'] = rating.time
+        result.append(rating_info)
+        print(rating_info)
+
+    return jsonify({'ratings' : result})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
