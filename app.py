@@ -170,7 +170,7 @@ def login():
 def add_mood_rating(curr_auth_user):
     data = request.get_json()
     #create mood rating object with user id as logged in user's id
-    new_mood_rating = MoodRating(value=data['value'], time=datetime.datetime.now(), user_id=curr_auth_user.id)
+    new_mood_rating = MoodRating(value=data['value'], time=datetime.date.today(), user_id=curr_auth_user.id)
     db.session.add(new_mood_rating)
     db.session.commit()
     return jsonify({'message': 'new mood rating has been created'})
@@ -179,7 +179,7 @@ def add_mood_rating(curr_auth_user):
 @require_token
 #function to get values from logged in user
 def get_user_mood_ratings(curr_auth_user):
-    #get mood ratings with user_id as the currently logged user
+    #get mood ratings with user_id as the currently logged in user
     ratings = MoodRating.query.filter_by(user_id=curr_auth_user.id).all()
     result = []
     for rating in ratings:
@@ -188,9 +188,30 @@ def get_user_mood_ratings(curr_auth_user):
         rating_info['value'] = rating.value
         rating_info['time'] = rating.time
         result.append(rating_info)
-        print(rating_info)
 
     return jsonify({'ratings' : result})
+
+@app.route('/mood', methods = ['VIEW'])
+@require_token
+#function to determine user streak
+def user_curr_streak(curr_auth_user):
+    #set value of streak initially to zero
+    streak = 0
+    #get mood ratings with user_id as the currently logged in user
+    ratings = MoodRating.query.filter_by(user_id=curr_auth_user.id).all()
+    if len(ratings) == 0:
+        streak = 0
+    else:
+        streak = 1
+        for i in range(1, len(ratings)):
+            if (ratings[i].time - ratings[i-1].time).days > 1:
+                #set streak to 1 if more than one day exists b/n two posts
+                streak = 1
+            elif (ratings[i].time - ratings[i-1].time).days == 1:
+                #if next post is next day, increase streak
+                streak += 1
+    return jsonify({'streak' : streak})
+
 
 
 if __name__ == '__main__':
